@@ -2,7 +2,7 @@
 
 var path = require('path');
 var fs = require('fs-extra');
-var ParseData = require(path.join(global.pathToApp, 'core/lib/parseData'));
+var parseData = require(path.join(global.pathToApp, 'core/lib/parseData'));
 
 
 /**
@@ -55,7 +55,7 @@ var getSpecIDFromUrl = module.exports.getSpecIDFromUrl = function(urlToSpec){
  */
 module.exports.getSpecInfo = function(urlSpecPath) {
     var specsDataPath = path.join(global.pathToApp, global.opts.core.api.specsData);
-    var parseSpecData = new ParseData({
+    var parseSpecData = new parseData({
         scope: 'specs',
         path: specsDataPath
     });

@@ -11,11 +11,11 @@ var ejs = require(path.join(global.pathToApp, 'core/ejsWithHelpers.js'));
 var trackStats = require(path.join(global.pathToApp, 'core/trackStats'));
 var pathToApp = path.dirname(require.main.filename);
 var specUtils = require(path.join(pathToApp, 'core/lib/specUtils'));
-var ParseData = require(path.join(pathToApp, 'core/lib/parseData'));
+var parseData = require(path.join(pathToApp, 'core/lib/parseData'));
 var specsParser = require(path.join(pathToApp, 'core/lib/specPageParser'));
 
 var htmlDataPath = path.join(pathToApp, global.opts.core.api.htmlData);
-var parseHTMLData = new ParseData({
+var parseHTMLData = new parseData({
     scope: 'html',
     path: htmlDataPath
 });

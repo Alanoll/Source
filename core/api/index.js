@@ -2,7 +2,7 @@
 
 var express = require('express');
 var path = require('path');
-var ParseData = require(path.join(global.pathToApp, 'core/lib/parseData'));
+var parseData = require(path.join(global.pathToApp, 'core/lib/parseData'));
 var utils = require(path.join(global.pathToApp, 'core/lib/utils'));
 var pathToApp = path.dirname(require.main.filename);
 var htmlTree = require(path.join(global.pathToApp, 'core/html-tree'));
@@ -26,7 +26,7 @@ var htmlDataPath = path.join(pathToApp, config.htmlData);
  *
  * @param {Object} req - express request
  * @param {Object} res - express response
- * @param {Object} parseObj - initiated ParseData instance
+ * @param {Object} parseObj - initiated parseData instance
  *
  * Writes result to res object
  */
@@ -89,7 +89,7 @@ var getSpecs = function (req, res, parseObj) {
  *
  * @param {Object} req - express request
  * @param {Object} res - express response
- * @param {Object} parseObj - initiated ParseData instance
+ * @param {Object} parseObj - initiated parseData instance
  *
  * Writes result to res object
  */
@@ -209,12 +209,12 @@ var presentationHandler = function (req, res) {
 /* Main API router */
 var apiRouter = express.Router();
 
-var parseHTMLData = new ParseData({
+var parseHTMLData = new parseData({
     scope: 'html',
     path: htmlDataPath
 });
 
-var parseSpecs = new ParseData({
+var parseSpecs = new parseData({
     scope: 'specs',
     path: specsDataPath
 });
@@ -281,12 +281,12 @@ var apiTestRouter = express.Router();
 var specsDataTestPath = path.join(pathToApp, config.specsTestData);
 var htmlDataTestPath = path.join(pathToApp, config.htmlTestData);
 
-var parseSpecsTest = new ParseData({
+var parseSpecsTest = new parseData({
     scope: 'specs',
     path: specsDataTestPath
 });
 
-var parseHTMLDataTest = new ParseData({
+var parseHTMLDataTest = new parseData({
     scope: 'html',
     path: htmlDataTestPath
 });
