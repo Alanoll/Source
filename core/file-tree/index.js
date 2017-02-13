@@ -47,7 +47,7 @@ if (Array.isArray(config.includedDirs)) {
 }
 
 /**
- * Prepare relative path for web usage (like `/docs/spec`, `/specs/btn`) out of absolute path
+ * Prepare relative path for web usage (like `/docs/spec-html`, `/specs/btn`) out of absolute path
  *
  * @param {String} path - absolute path to Spec directory or Spec file
  *
@@ -171,6 +171,11 @@ var fileTree = function(workingDir) {
     if (!fs.existsSync(workingDir) && workingDir === config.specsRoot) {
         global.log.warn('Running SourceJS without user dir. This set-up should be used only for running tests.');
         workingDir = normalizedPathToApp;
+    } else {
+        // TODO:clear with 0.7 version
+        if (!global.isNodeModule) {
+            global.log.error('Deprecation warning: since next version, running SourceJS with nested user folder structure scenario (not as an npm dependency) will be no longer supported.');
+        }
     }
 
     var files = globArray(glob, {

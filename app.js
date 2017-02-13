@@ -1,7 +1,7 @@
 /*!
 * SourceJS - Living Style Guides Engine and Integrated Maintenance Environment for Front-end Components
 * @copyright 2013-2015 Sourcejs.com
-* @license MIT license: http://github.com/sourcejs/source/wiki/MIT-License
+* @license MIT license: http://github.com/sourcejs/sourcejs/wiki/MIT-License
 * */
 
 'use strict';
@@ -70,7 +70,7 @@ if (!commander.watch) {
 }
 
 if (process.env.PORT) {
-    global.opts.core.server.port = parseInt(process.env.PORT);
+    global.opts.core.server.port = process.env.PORT;
     console.log('Using defined app PORT from environment variable: ' + process.env.PORT);
 }
 /* /Globals */
