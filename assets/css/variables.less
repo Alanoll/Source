@@ -11,6 +11,13 @@
 /* /Media */
 
 
+/* Navigation
+-------------------------------------------------- */
+@source_main_nav--width: 280px;
+@source_main_nav--top: 163px;
+/* /Navigation */
+
+
 /* Layout
 -------------------------------------------------- */
 @border-radius: 10px;
@@ -19,15 +26,9 @@
 @layout_col-main--max-width: @max-width - @layout_col-main--padding * 2;
 
 @layout_spec--inner-padding: 25px;
-@layout_spec--inner-margin-right: 32%;
+@layout_spec--inner-margin-right: @source_main_nav--width + layout_col-main--padding;
 /* /Layout */
 
-
-/* Navigation
--------------------------------------------------- */
-@source_main_nav--width: 280px;
-@source_main_nav--top: 163px;
-/* /Navigation */
 
 
 /* Colors
