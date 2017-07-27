@@ -2,9 +2,9 @@
 
 var express = require('express');
 var path = require('path');
-var parseData = require(path.join(global.pathToApp, 'core/lib/parseData'));
+var ParseData = require(path.join(global.pathToApp, 'core/lib/parseData'));
 var utils = require(path.join(global.pathToApp, 'core/lib/utils'));
-var pathToApp = path.dirname(require.main.filename);
+var pathToApp = global.pathToApp;
 var htmlTree = require(path.join(global.pathToApp, 'core/html-tree'));
 var unflatten = require(path.join(global.pathToApp,'core/unflat'));
 
@@ -26,7 +26,7 @@ var htmlDataPath = path.join(pathToApp, config.htmlData);
  *
  * @param {Object} req - express request
  * @param {Object} res - express response
- * @param {Object} parseObj - initiated parseData instance
+ * @param {Object} parseObj - initiated ParseData instance
  *
  * Writes result to res object
  */
@@ -89,7 +89,7 @@ var getSpecs = function (req, res, parseObj) {
  *
  * @param {Object} req - express request
  * @param {Object} res - express response
- * @param {Object} parseObj - initiated parseData instance
+ * @param {Object} parseObj - initiated ParseData instance
  *
  * Writes result to res object
  */
@@ -209,12 +209,12 @@ var presentationHandler = function (req, res) {
 /* Main API router */
 var apiRouter = express.Router();
 
-var parseHTMLData = new parseData({
+var parseHTMLData = new ParseData({
     scope: 'html',
     path: htmlDataPath
 });
 
-var parseSpecs = new parseData({
+var parseSpecs = new ParseData({
     scope: 'specs',
     path: specsDataPath
 });
@@ -227,7 +227,7 @@ apiRouter.use(function(req, res, next) {
 });
 
 apiRouter.get('/', function(req, res) {
-	res.json({ message: 'Hello API' });
+    res.json({ message: 'Hello API' });
 });
 
 apiRouter.route('/specs/raw')
@@ -281,12 +281,12 @@ var apiTestRouter = express.Router();
 var specsDataTestPath = path.join(pathToApp, config.specsTestData);
 var htmlDataTestPath = path.join(pathToApp, config.htmlTestData);
 
-var parseSpecsTest = new parseData({
+var parseSpecsTest = new ParseData({
     scope: 'specs',
     path: specsDataTestPath
 });
 
-var parseHTMLDataTest = new parseData({
+var parseHTMLDataTest = new ParseData({
     scope: 'html',
     path: htmlDataTestPath
 });
@@ -299,7 +299,7 @@ apiTestRouter.use(function(req, res, next) {
 });
 
 apiTestRouter.get('/', function(req, res) {
-	res.json({ message: 'API Testig env' });
+    res.json({ message: 'API Testig env' });
 });
 
 apiTestRouter.route('/specs')

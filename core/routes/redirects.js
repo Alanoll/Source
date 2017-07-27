@@ -8,8 +8,7 @@
 
 var path = require('path');
 var express = require('express');
-var pathToApp = path.dirname(require.main.filename);
-
+var pathToApp = global.pathToApp;
 
 /*
 *
@@ -25,7 +24,7 @@ var pathToApp = path.dirname(require.main.filename);
 // Check overrides from user folder
 global.app.use('/source/assets', express.static(path.join(pathToApp, global.opts.core.common.pathToUser, 'source/assets')));
 
-// Check if there's minified assets
+// Check if minified assets available
 global.app.use('/source/assets', express.static(path.join(pathToApp,'build/assets')));
 global.app.use('/assets', express.static(path.join(pathToApp, 'build', global.opts.core.common.pathToUser, 'assets')));
 
@@ -35,5 +34,6 @@ global.app.use('/source/assets', express.static(path.join(pathToApp, 'assets')))
 
 // Custom routes
 global.app.use('/docs', express.static(path.join(pathToApp, '/docs')));
+global.app.use('/test', express.static(path.join(pathToApp, '/test')));
 global.app.use('/jsdoc', express.static(path.join(pathToApp, '/jsdoc')));
-global.app.use('/test', express.static(path.join(pathToApp, '/assets/test')));
+global.app.use('/jasmine-test', express.static(path.join(pathToApp, '/assets/test')));

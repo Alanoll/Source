@@ -1,29 +1,30 @@
 'use strict';
 
 var fs = require('fs-extra');
-var extend = require('extend');
-var deepExtend = require('deep-extend');
+var _ = require('lodash');
 var path = require('path');
 var extendTillSpec = require(path.join(global.pathToApp,'core/lib/extendTillSpec'));
 var unflatten = require(path.join(global.pathToApp,'core/unflat'));
 var specUtils = require(path.join(global.pathToApp,'core/lib/specUtils'));
 var utils = require(path.join(global.pathToApp,'core/lib/utils'));
+var globArray = require(path.join(global.pathToApp,'core/lib/globArray'));
 var coreOpts = global.opts.core;
 var prettyHrtime = require('pretty-hrtime');
 
 var busy = false;
+var normalizedPathToApp = global.pathToApp.replace(/\\/g, '/');
+var userPath = global.userPath.replace(/\\/g, '/');
 
 var config = {
     includedDirs: coreOpts.common.includedDirs,
-    excludedDirs: [],
 
-    // TODO: merge with `excludedDirs` in next major release.
-    excludedDirsGlobal: [],
+    // Filled from options.js
+    excludes: [],
     cron: false,
     cronProd: true,
     cronRepeatTime: 60000,
     outputFile: path.join(global.pathToApp, 'core/api/data/pages-tree.json'),
-    specsRoot: path.join(global.pathToApp, coreOpts.common.pathToUser).replace(/\\/g, '/'),
+    specsRoot: userPath,
     busyTimeout: 300,
     thumbnail: 'thumbnail.png'
 };
@@ -31,25 +32,22 @@ var config = {
 // Overwriting base options
 utils.extendOptions(config, coreOpts.fileTree);
 
-var normalizedPathToApp = global.pathToApp.replace(/\\/g, '/');
+var relativePathFromUserToApp = path.relative(userPath, normalizedPathToApp);
+var glob = config.excludes;
+glob.unshift('**/info.json');
 
-var prepareExcludesRegex = function(){
-    var dirsForRegExp = '';
-    var i = 1;
-    config.excludedDirs.forEach(function (exlDir) {
-        if (i < config.excludedDirs.length) {
-            dirsForRegExp = dirsForRegExp + '^' + config.specsRoot + '\/' + exlDir + '|';
+if (Array.isArray(config.includedDirs)) {
+    config.includedDirs.forEach(function(item){
+        if (global.isNodeModule) {
+            glob.push('node_modules/sourcejs/' + item + '/**/info.json');
         } else {
-            dirsForRegExp = dirsForRegExp + '^' + config.specsRoot + '\/' + exlDir;
+            glob.push(relativePathFromUserToApp + '/' + item + '/**/info.json');
         }
-        i++;
     });
-    return new RegExp(dirsForRegExp);
-};
-
+}
 
 /**
- * Prepare relative path for web usage (like `/docs/spec`, `/specs/btn`) out of absolute path
+ * Prepare relative path for web usage (like `/docs/spec-html`, `/specs/btn`) out of absolute path
  *
  * @param {String} path - absolute path to Spec directory or Spec file
  *
@@ -62,43 +60,17 @@ var getRelativeSpecPath = module.exports.getRelativeSpecPath = function(absolute
         // If starts with root (specs)
 
         // Cleaning path to specs root folder
-        relativeSpecPath = absolutePath.replace(config.specsRoot, '');
+        relativeSpecPath = absolutePath.replace(config.specsRoot, '').replace('node_modules/sourcejs/', '');
     } else {
         // Cleaning path for included folders
-
         relativeSpecPath = absolutePath.replace(normalizedPathToApp, '');
     }
 
+    if (relativeSpecPath === '') {
+        relativeSpecPath = '/';
+    }
+
     return relativeSpecPath;
-};
-
-var getSpecLocation = function(specDirOrPath){
-    // Normalize windows URL and remove trailing slash
-    var _specDirOrPath = specDirOrPath.replace(/\\/g, '/').replace(/\/$/, '');
-    var isSpecPath = path.extname(_specDirOrPath) !== '';
-    var specDir;
-    var specPath;
-    var relativeSpecPath = getRelativeSpecPath(_specDirOrPath);
-
-    if (isSpecPath) {
-        relativeSpecPath = path.dirname(relativeSpecPath);
-    }
-
-    // Try to get specPath
-    if (isSpecPath) {
-        specDir = path.dirname(_specDirOrPath);
-        specPath = _specDirOrPath;
-    } else {
-        specDir = _specDirOrPath;
-        specPath = specUtils.getSpecFromDir(_specDirOrPath);
-    }
-
-    return {
-        relativeSpecPath: relativeSpecPath,
-        isSpecPath: isSpecPath,
-        specDir: specDir,
-        specPath: specPath
-    };
 };
 
 /**
@@ -115,9 +87,10 @@ var getThumbnailPath = module.exports.getThumbnailPath = function(specDir, custo
     var thumbnail;
     var thumbnailPathFromSpecDir = customThumbnailPath || config.thumbnail;
 
-    var absoluteThumbNailPath = path.join(specDir, thumbnailPathFromSpecDir).replace(/\\/g, '/');
+    var absoluteThumbNailPath = path.join(specDir, thumbnailPathFromSpecDir);
+
     if (fs.existsSync(absoluteThumbNailPath)) {
-        thumbnail = path.join(getRelativeSpecPath(specDir), thumbnailPathFromSpecDir);
+        thumbnail = path.join(getRelativeSpecPath(specDir), thumbnailPathFromSpecDir).replace(/\\/g, '/');
     }
 
     return thumbnail;
@@ -154,23 +127,21 @@ var getSpecInfoFile = module.exports.getSpecInfoFile = function(specDir){
 /**
  * Prepares Spec meta object from specs directory or Spec file path
  *
- * @param {String} specDirOrPath - path to Spec directory or Spec file
+ * @param {String} specDir - path to Spec directory
  *
  * @returns {Object} Return Spec file meta info (used in file-tree.json and in other places)
  */
-var getSpecMeta = module.exports.getSpecMeta = function(specDirOrPath){
+var getSpecMeta = module.exports.getSpecMeta = function(specDir){
     var page = {};
 
     // Check if arg is provided and path exists
-    if ( !(specDirOrPath && fs.existsSync(specDirOrPath))) return page;
+    if ( !(specDir && fs.existsSync(specDir)) ) return page;
 
-    var specLocation = getSpecLocation(specDirOrPath);
-    var specPath = specLocation.specPath;
-    var specDir = specLocation.specDir;
-    var relativeSpecPath = specLocation.relativeSpecPath;
+    var relativeSpecPath = getRelativeSpecPath(specDir);
+    var specPath = specUtils.getSpecFromDir(specDir);
 
     // Remove first slash for ID
-    page.id = relativeSpecPath.substring(1);
+    page.id = relativeSpecPath === '/' ? '/' : relativeSpecPath.replace(/^\//, '');
     page.url = relativeSpecPath;
 
     // If we have Spec, get additional meta
@@ -188,63 +159,46 @@ var getSpecMeta = module.exports.getSpecMeta = function(specDirOrPath){
     page.thumbnail = getThumbnailPath(specDir, specInfo.thumbnailPath) || false;
 
     // Apply info file contents on top
-    deepExtend(page, specInfo);
+    _.merge(page, specInfo);
 
     return page;
 };
 
-var fileTree = function (workingDir) {
-    var processingDir = workingDir;
+var fileTree = function(workingDir) {
     var outputJSON = {};
 
     // Allow to run app without existing specsRoot
     if (!fs.existsSync(workingDir) && workingDir === config.specsRoot) {
         global.log.warn('Running SourceJS without user dir. This set-up should be used only for running tests.');
-        processingDir = global.pathToApp;
-    }
-
-    var dirContent = fs.readdirSync(processingDir);
-    var excludes = prepareExcludesRegex();
-
-    // Adding paths to files in array
-    for (var i = 0; dirContent.length > i; i++) {
-        dirContent[i] = path.join(processingDir, dirContent[i].replace(/\\/g, '/'));
-    }
-
-    //on first call we add includedDirs
-    if (processingDir === config.specsRoot) {
-        config.includedDirs.map(function (includedDir) {
-            dirContent.push(path.join(normalizedPathToApp, includedDir));
-        });
-    }
-
-    dirContent.forEach(function(pathToFile) {
-        // Path is excluded
-        if (excludes.test(processingDir)) return;
-
-        var infoFileName = coreOpts.common.infoFile;
-        var targetFile = path.basename(pathToFile);
-
-        // Normalizing path for windows
-        pathToFile = path.normalize(pathToFile).replace(/\\/g, '/');
-
-        var fileStats = fs.statSync(pathToFile);
-
-        if (fileStats.isDirectory()) {
-            if (config.excludedDirsGlobal.indexOf(targetFile) > -1) return;
-
-            // Going deeper
-            var childObj = fileTree(pathToFile);
-            if (Object.getOwnPropertyNames(childObj).length !== 0) {
-                outputJSON[targetFile] = extend(outputJSON[targetFile], childObj);
-            }
-
-        } else if (targetFile.toLowerCase() === infoFileName.toLowerCase()) {
-            outputJSON['specFile'] = getSpecMeta(processingDir);
+        workingDir = normalizedPathToApp;
+    } else {
+        // TODO:clear with 0.7 version
+        if (!global.isNodeModule) {
+            global.log.error('Deprecation warning: since next version, running SourceJS with nested user folder structure scenario (not as an npm dependency) will be no longer supported.');
         }
+    }
+
+    var files = globArray(glob, {
+        cwd: workingDir
     });
 
-    return outputJSON;
+    files.forEach(function(file){
+        var realFilePath = path.join(workingDir, file);
+        var specPath = path.dirname(realFilePath).replace(/\\/g, '/');
+        var specId;
+
+        if (global.isNodeModule) {
+            specId = path.dirname(file).replace('node_modules/sourcejs/', '');
+        } else {
+            specId = path.dirname(file).replace(relativePathFromUserToApp + '/','');
+        }
+
+        specId = specId === '.' ? '' : specId + '/';
+
+        outputJSON[specId + 'specFile'] = getSpecMeta(specPath);
+    });
+
+    return unflatten(outputJSON, { delimiter: '/', overwrite: 'root' });
 };
 
 // function for write file tree json
@@ -283,7 +237,7 @@ var updateFileTree = module.exports.updateFileTree = function (data, unflattenDa
         }
 
         try {
-            prevData = fs.readJsonFileSync(dataStoragePath);
+            prevData = fs.readJsonSync(dataStoragePath);
         } catch (e) {
             global.log.trace('Reading initial data error: ', e);
             global.log.debug('Extending from empty object, as we do not have initial data');

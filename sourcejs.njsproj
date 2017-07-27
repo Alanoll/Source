@@ -1,0 +1,382 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{006e2cc5-2752-410f-95c4-3ea6cf4946d1}</ProjectGuid>
+    <ProjectHome />
+    <ProjectView>ShowAllFiles</ProjectView>
+    <StartupFile>app.js</StartupFile>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <ProjectTypeGuids>{3AF33F2E-1136-4D97-BBB7-1795711AC8B8};{349c5851-65df-11da-9384-00065b846f21};{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}</ProjectTypeGuids>
+    <TypeScriptSourceMap>true</TypeScriptSourceMap>
+    <TypeScriptModuleKind>CommonJS</TypeScriptModuleKind>
+    <EnableTypeScript>true</EnableTypeScript>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
+  <ItemGroup>
+    <Content Include=".bithoundrc" />
+    <Content Include=".editorconfig" />
+    <Content Include=".gitignore" />
+    <Content Include=".jshintrc" />
+    <Content Include=".npmignore" />
+    <Content Include=".travis.yml" />
+    <Content Include="appveyor.yml" />
+    <Content Include="package.json" />
+    <Content Include="CONTRIBUTING.md" />
+    <Content Include="License.md" />
+    <Content Include="MAINTAINING.md" />
+    <Content Include="README.md" />
+    <Compile Include="app.js" />
+    <Compile Include="Gruntfile.js" />
+    <Compile Include="options.js" />
+    <Compile Include="core\auth.js" />
+    <Compile Include="core\ejsWithHelpers.js" />
+    <Compile Include="core\headerFooter.js" />
+    <Compile Include="core\loadOptions.js" />
+    <Compile Include="core\loadPlugins.js" />
+    <Compile Include="core\logger.js" />
+    <Compile Include="core\privateAmdTransformer.js" />
+    <Compile Include="core\trackInstall.js" />
+    <Compile Include="core\trackStats.js" />
+    <Compile Include="core\unflat.js" />
+    <Content Include="docs\index.src.html" />
+    <Content Include="docs\info.json" />
+    <Content Include="docs\README.md" />
+    <Content Include="source.sh" />
+    <Content Include="sourcejs-core\package.json" />
+    <Content Include="sourcejs-core\README.md" />
+    <Compile Include="sourcejs-core\app.js" />
+    <Content Include="test\index.src.html" />
+    <Content Include="test\info.json" />
+    <Content Include="assets\css\source.css" />
+    <Content Include="assets\fonts\Webfont EULA 1.6.txt" />
+    <Content Include="assets\i\note.png" />
+    <Content Include="assets\i\search.png" />
+    <Content Include="assets\i\spec_design.png" />
+    <Content Include="assets\i\spec_design_link.png" />
+    <Content Include="assets\i\spec_link.png" />
+    <Content Include="assets\i\warn.png" />
+    <Content Include="assets\i\github-loagind.gif" />
+    <Content Include="assets\i\process.gif" />
+    <Content Include="assets\i\unknown.gif" />
+    <Content Include="assets\i\link-external.svg" />
+    <Content Include="assets\i\spec_design_link.svg" />
+    <Content Include="assets\i\spec_link.svg" />
+    <Compile Include="assets\js\clarify.js" />
+    <Compile Include="assets\js\enter-the-source.js" />
+    <Compile Include="assets\js\load-options.js" />
+    <Compile Include="assets\js\_require-config.js" />
+    <Compile Include="assets\js\_require.bundle.js" />
+    <Content Include="assets\templates\clarifyPanel.inc.html" />
+    <Content Include="assets\templates\footer.inc.html" />
+    <Content Include="assets\templates\header.inc.html" />
+    <Content Include="assets\templates\navActionItem.inc.html" />
+    <Content Include="assets\templates\navActionTumbler.inc.html" />
+    <Content Include="assets\templates\nav.inc.html" />
+    <Content Include="assets\test\index.html" />
+    <Compile Include="assets\js\lib\autocomplete.js" />
+    <Compile Include="assets\js\lib\codeFormat.js" />
+    <Compile Include="assets\js\lib\html5shiv.js" />
+    <Compile Include="assets\js\lib\jquery-2.1.4.min.js" />
+    <Compile Include="assets\js\lib\jquery-private.js" />
+    <Compile Include="assets\js\lib\jquery.autocomplete.js" />
+    <Compile Include="assets\js\lib\jquery.couch.js" />
+    <Compile Include="assets\js\lib\jquery.mb.browser.js" />
+    <Compile Include="assets\js\lib\lodash-private.js" />
+    <Compile Include="assets\js\lib\lodash.js" />
+    <Compile Include="assets\js\lib\modalbox.js" />
+    <Compile Include="assets\js\lib\require.js" />
+    <Compile Include="assets\js\lib\text.js" />
+    <Compile Include="assets\js\modules\auth.js" />
+    <Compile Include="assets\js\modules\browser.js" />
+    <Compile Include="assets\js\modules\clarifyInSpec.js" />
+    <Compile Include="assets\js\modules\codeSource.js" />
+    <Compile Include="assets\js\modules\couch.js" />
+    <Compile Include="assets\js\modules\css.js" />
+    <Compile Include="assets\js\modules\globalNav.js" />
+    <Compile Include="assets\js\modules\headerFooter.js" />
+    <Compile Include="assets\js\modules\htmlAPISync.js" />
+    <Compile Include="assets\js\modules\inlineOptions.js" />
+    <Compile Include="assets\js\modules\innerNavigation.js" />
+    <Compile Include="assets\js\modules\loadEvents.js" />
+    <Compile Include="assets\js\modules\module.js" />
+    <Compile Include="assets\js\modules\moduleLoader.js" />
+    <Compile Include="assets\js\modules\navHighlight.js" />
+    <Compile Include="assets\js\modules\ntf.js" />
+    <Compile Include="assets\js\modules\parseFileTree.js" />
+    <Compile Include="assets\js\modules\scrollToHash.js" />
+    <Compile Include="assets\js\modules\search.js" />
+    <Compile Include="assets\js\modules\sectionFolding.js" />
+    <Compile Include="assets\js\modules\sections.js" />
+    <Compile Include="assets\js\modules\sectionsParser.js" />
+    <Compile Include="assets\js\modules\specDecorations.js" />
+    <Compile Include="assets\js\modules\trimSpaces.js" />
+    <Compile Include="assets\js\modules\utils.js" />
+    <Content Include="assets\js\lib\prism\prism.css" />
+    <Compile Include="assets\js\lib\prism\prism.js" />
+    <Content Include="assets\test\jasmine\jasmine.css" />
+    <Compile Include="assets\test\jasmine\jasmine-html.js" />
+    <Compile Include="assets\test\jasmine\jasmine.js" />
+    <Compile Include="assets\test\js\tests.js" />
+    <Compile Include="assets\test\spec\innerNavigationSpec.js" />
+    <Compile Include="assets\test\spec\moduleSpec.js" />
+    <Compile Include="assets\test\spec\sectionsSpec.js" />
+    <Compile Include="core\api\index.js" />
+    <Compile Include="core\api\optionsApi.js" />
+    <Compile Include="core\file-tree\index.js" />
+    <Compile Include="core\html-tree\index.js" />
+    <Compile Include="core\lib\configUtils.js" />
+    <Compile Include="core\lib\extendTillSpec.js" />
+    <Compile Include="core\lib\flattenTillSpec.js" />
+    <Compile Include="core\lib\getUserPath.js" />
+    <Compile Include="core\lib\globArray.js" />
+    <Compile Include="core\lib\isNodeModule.js" />
+    <Compile Include="core\lib\parseData.js" />
+    <Compile Include="core\lib\pathResolver.js" />
+    <Compile Include="core\lib\processMd.js" />
+    <Compile Include="core\lib\request.js" />
+    <Compile Include="core\lib\specPageParser.js" />
+    <Compile Include="core\lib\specUtils.js" />
+    <Compile Include="core\lib\translit.js" />
+    <Compile Include="core\lib\utils.js" />
+    <Compile Include="core\lib\viewResolver.js" />
+    <Compile Include="core\middlewares\breadcrumb.js" />
+    <Compile Include="core\middlewares\clarify.js" />
+    <Compile Include="core\middlewares\loader.js" />
+    <Compile Include="core\middlewares\md.js" />
+    <Compile Include="core\middlewares\mdTag.js" />
+    <Compile Include="core\middlewares\preRenderEjs.js" />
+    <Compile Include="core\middlewares\read.js" />
+    <Compile Include="core\middlewares\send.js" />
+    <Compile Include="core\middlewares\wrap.js" />
+    <Compile Include="core\routes\index.js" />
+    <Compile Include="core\routes\redirects.js" />
+    <Content Include="core\views\404.ejs" />
+    <Content Include="core\views\auth-done.ejs" />
+    <Content Include="core\views\breadcrumb.ejs" />
+    <Content Include="core\views\clean-spec.ejs" />
+    <Content Include="core\views\doc.ejs" />
+    <Content Include="core\views\navigation.ejs" />
+    <Content Include="core\views\spec.ejs" />
+    <Compile Include="core\watch\childWatch.js" />
+    <Compile Include="core\watch\index.js" />
+    <Content Include="core\views\clarify\clear.ejs" />
+    <Content Include="core\views\clarify\default.ejs" />
+    <Content Include="docs\api\index.src.html" />
+    <Content Include="docs\api\info.json" />
+    <Content Include="docs\api\readme.md" />
+    <Content Include="docs\auth\info.json" />
+    <Content Include="docs\auth\readme.md" />
+    <Content Include="docs\base\info.json" />
+    <Content Include="docs\base\readme.md" />
+    <Content Include="docs\build-tasks\info.json" />
+    <Content Include="docs\build-tasks\readme.md" />
+    <Content Include="docs\clarify\thumbnail.png" />
+    <Content Include="docs\clarify\info.json" />
+    <Content Include="docs\clarify\readme.md" />
+    <Content Include="docs\configuration\info.json" />
+    <Content Include="docs\configuration\readme.md" />
+    <Content Include="docs\data\bootstrap.css" />
+    <Content Include="docs\data-nav\info.json" />
+    <Content Include="docs\data-nav\readme.md" />
+    <Content Include="docs\migration\info.json" />
+    <Content Include="docs\migration\readme.md" />
+    <Content Include="docs\spec-ejs\info.json" />
+    <Content Include="docs\spec-ejs\readme.md" />
+    <Content Include="docs\spec-file\info.json" />
+    <Content Include="docs\spec-file\readme.md" />
+    <Content Include="docs\spec-html\index.src.html" />
+    <Content Include="docs\spec-html\info.json" />
+    <Content Include="docs\spec-html-example\index.src.html" />
+    <Content Include="docs\spec-html-example\info.json" />
+    <Content Include="docs\spec-json\info.json" />
+    <Content Include="docs\spec-json\readme.md" />
+    <Content Include="docs\spec-markdown\info.json" />
+    <Content Include="docs\spec-markdown\readme.md" />
+    <Content Include="docs\spec-markdown-example\info.json" />
+    <Content Include="docs\spec-markdown-example\readme.md" />
+    <Content Include="docs\api\load-events\info.json" />
+    <Content Include="docs\api\load-events\readme.md" />
+    <Content Include="docs\api\plugins\info.json" />
+    <Content Include="docs\api\plugins\readme.md" />
+    <Content Include="docs\api\rest-api\info.json" />
+    <Content Include="docs\api\rest-api\readme.md" />
+    <Content Include="docs\base\i\files.png" />
+    <Content Include="docs\clarify\i\clarify.png" />
+    <Content Include="docs\data-nav\example\info.json" />
+    <Content Include="docs\data-nav\example\readme.md" />
+    <Content Include="docs\spec-ejs\examples\buttons.html" />
+    <Content Include="docs\spec-ejs\examples\include.html" />
+    <Content Include="docs\spec-ejs\examples\mask-one.html" />
+    <Content Include="docs\spec-ejs\examples\mask-two.html" />
+    <Content Include="docs\spec-ejs\examples\three.html" />
+    <Content Include="docs\spec-ejs\examples\markdown-file.md" />
+    <Content Include="docs\spec-file\examples\buttons.html" />
+    <Content Include="docs\spec-file\examples\include.html" />
+    <Content Include="docs\spec-file\examples\mask-one.html" />
+    <Content Include="docs\spec-file\examples\mask-two.html" />
+    <Content Include="docs\spec-file\examples\three.html" />
+    <Content Include="docs\spec-file\examples\markdown-file.md" />
+    <Content Include="docs\spec-html\css\spec.css" />
+    <Content Include="docs\spec-html-example\css\starting.css" />
+    <Content Include="docs\spec-markdown-example\css\starting.css" />
+    <Content Include="docs\test-specs\styles\index.src.html" />
+    <Content Include="docs\test-specs\styles\info.json" />
+    <Content Include="docs\test-specs\styles\includes\all-tags.html" />
+    <TypeScriptCompile Include="sourcejs-core\typings\index.d.ts" />
+    <Content Include="sourcejs-core\typings\globals\node\typings.json" />
+    <Content Include="test\data\api-test-html.json" />
+    <Content Include="test\data\api-test-specs.json" />
+    <Content Include="test\functional\snippets.md" />
+    <Compile Include="test\functional\clarify.js" />
+    <Compile Include="test\functional\common.js" />
+    <Compile Include="test\functional\globalNav.js" />
+    <Compile Include="test\functional\search.js" />
+    <Compile Include="test\functional\specpage.js" />
+    <Content Include="test\partials\mask-one.html" />
+    <Content Include="test\partials\mask-two.html" />
+    <Content Include="test\partials\three.html" />
+    <Content Include="test\partials\markdown-ejs-nested.md" />
+    <Content Include="test\partials\markdown-ejs.md" />
+    <Content Include="test\partials\markdown.md" />
+    <Compile Include="test\unit\ejsHelpersSpec.js" />
+    <Content Include="test\partials\specs\complex\index.src.html" />
+    <Content Include="test\partials\specs\complex\info.json" />
+    <Content Include="test\partials\specs\few-examples\index.src.html" />
+    <Content Include="test\partials\specs\few-examples\info.json" />
+    <Content Include="test\partials\specs\many-assets\index.src.html" />
+    <Content Include="test\partials\specs\many-assets\info.json" />
+    <Content Include="test\partials\specs\many-assets\template.ejs" />
+    <Content Include="test\partials\specs\nested\index.src.html" />
+    <Content Include="test\partials\specs\nested\info.json" />
+    <Content Include="test\partials\specs\simple\index.src.html" />
+    <Content Include="test\partials\specs\simple\info.json" />
+    <Compile Include="test\unit\api\html.js" />
+    <Compile Include="test\unit\api\specs.js" />
+    <Compile Include="test\unit\lib\extendTillSpec.js" />
+    <Compile Include="test\unit\lib\specPageParserSpec.js" />
+    <Compile Include="test\unit\lib\utilsSpec.js" />
+    <Compile Include="test\unit\middlewares\clarifySpec.js" />
+    <Compile Include="test\unit\middlewares\mdSpec.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="assets" />
+    <Folder Include="assets\css" />
+    <Folder Include="assets\css\base" />
+    <Folder Include="assets\css\cosmetic" />
+    <Folder Include="assets\css\project" />
+    <Folder Include="assets\fonts" />
+    <Folder Include="assets\i" />
+    <Folder Include="assets\js" />
+    <Folder Include="assets\js\lib" />
+    <Folder Include="assets\js\lib\prism" />
+    <Folder Include="assets\js\modules" />
+    <Folder Include="assets\templates" />
+    <Folder Include="assets\test" />
+    <Folder Include="assets\test\jasmine" />
+    <Folder Include="assets\test\js" />
+    <Folder Include="assets\test\spec" />
+    <Folder Include="core" />
+    <Folder Include="core\api" />
+    <Folder Include="core\file-tree" />
+    <Folder Include="core\html-tree" />
+    <Folder Include="core\lib" />
+    <Folder Include="core\middlewares" />
+    <Folder Include="core\routes" />
+    <Folder Include="core\views" />
+    <Folder Include="core\views\clarify" />
+    <Folder Include="core\watch" />
+    <Folder Include="docs" />
+    <Folder Include="docs\api" />
+    <Folder Include="docs\api\load-events" />
+    <Folder Include="docs\api\plugins" />
+    <Folder Include="docs\api\rest-api" />
+    <Folder Include="docs\auth" />
+    <Folder Include="docs\base" />
+    <Folder Include="docs\base\i" />
+    <Folder Include="docs\build-tasks" />
+    <Folder Include="docs\clarify" />
+    <Folder Include="docs\clarify\i" />
+    <Folder Include="docs\configuration" />
+    <Folder Include="docs\data" />
+    <Folder Include="docs\data-nav" />
+    <Folder Include="docs\data-nav\example" />
+    <Folder Include="docs\migration" />
+    <Folder Include="docs\spec-ejs" />
+    <Folder Include="docs\spec-ejs\examples" />
+    <Folder Include="docs\spec-file" />
+    <Folder Include="docs\spec-file\examples" />
+    <Folder Include="docs\spec-html" />
+    <Folder Include="docs\spec-html\css" />
+    <Folder Include="docs\spec-html-example" />
+    <Folder Include="docs\spec-html-example\css" />
+    <Folder Include="docs\spec-json" />
+    <Folder Include="docs\spec-markdown" />
+    <Folder Include="docs\spec-markdown-example" />
+    <Folder Include="docs\spec-markdown-example\css" />
+    <Folder Include="docs\test-specs" />
+    <Folder Include="docs\test-specs\styles" />
+    <Folder Include="docs\test-specs\styles\includes" />
+    <Folder Include="test" />
+    <Folder Include="test\data" />
+    <Folder Include="test\functional" />
+    <Folder Include="test\partials" />
+    <Folder Include="test\partials\specs" />
+    <Folder Include="test\partials\specs\complex" />
+    <Folder Include="test\partials\specs\few-examples" />
+    <Folder Include="test\partials\specs\many-assets" />
+    <Folder Include="test\partials\specs\nested" />
+    <Folder Include="test\partials\specs\simple" />
+    <Folder Include="test\unit" />
+    <Folder Include="test\unit\api" />
+    <Folder Include="test\unit\lib" />
+    <Folder Include="test\unit\middlewares" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <!--Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them.-->
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="False" />
+  <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsTools.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>False</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>0</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:48022/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>True</UseCustomServer>
+          <CustomServerUrl>http://localhost:1337</CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}" User="">
+        <WebProjectProperties>
+          <StartPageUrl>
+          </StartPageUrl>
+          <StartAction>CurrentPage</StartAction>
+          <AspNetDebugging>True</AspNetDebugging>
+          <SilverlightDebugging>False</SilverlightDebugging>
+          <NativeDebugging>False</NativeDebugging>
+          <SQLDebugging>False</SQLDebugging>
+          <ExternalProgram>
+          </ExternalProgram>
+          <StartExternalURL>
+          </StartExternalURL>
+          <StartCmdLineArguments>
+          </StartCmdLineArguments>
+          <StartWorkingDirectory>
+          </StartWorkingDirectory>
+          <EnableENC>False</EnableENC>
+          <AlwaysStartWebServerOnDebug>False</AlwaysStartWebServerOnDebug>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

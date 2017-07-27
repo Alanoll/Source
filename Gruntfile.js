@@ -12,7 +12,7 @@ var getLoaderPackageName = function() {
     var packageName;
     var parentFolderName = path.basename(path.resolve('..'));
     var isSubPackage = parentFolderName === 'node_modules';
-    var isLocalDepsAvailable = fs.existsSync('node_modules/grunt-autoprefixer') && fs.existsSync('node_modules/grunt-contrib-cssmin');
+    var isLocalDepsAvailable = fs.existsSync('node_modules/grunt-autoprefixer') && fs.existsSync('node_modules/grunt-contrib-copy');
 
     if (isSubPackage && !isLocalDepsAvailable) {
         packageName = 'load-grunt-parent-tasks';
@@ -27,7 +27,7 @@ module.exports = function(grunt) {
     var appPort = grunt.option('app-port') || 8080;
 
     // load all grunt tasks matching the `grunt-*` pattern
-    require(getLoaderPackageName())(grunt);
+    require(getLoaderPackageName())(grunt, {pattern: ['grunt-*', '@*/grunt-*']});
 
     // measuring processing time
     require('time-grunt')(grunt);
@@ -40,7 +40,7 @@ module.exports = function(grunt) {
         banner:'/*!\n' +
                 '* SourceJS - Living Style Guides Engine and Integrated Maintenance Environment for Front-end Components.\n' +
                 '* @copyright 2013-2015 Sourcejs.com\n' +
-                '* @license MIT license: http://github.com/sourcejs/source/wiki/MIT-License\n' +
+                '* @license MIT license: http://github.com/sourcejs/sourcejs/wiki/MIT-License\n' +
                 '* */\n',
 
         // clean files after build
@@ -230,8 +230,6 @@ module.exports = function(grunt) {
     });
 
     grunt.registerTask('resolve-js-bundles', 'Resolving JS imports in _**.bundle.js', function(){
-        var gruntOpts = grunt.config.get('options');
-
         // Setting custom delimiters for grunt.template
         grunt.template.addDelimiters('customBundleDelimiter', '"{%', '%}"');
 
@@ -250,11 +248,7 @@ module.exports = function(grunt) {
             grunt.file.write(
                 outputFullPath,
                 grunt.template.process(grunt.file.read(pathToFile), {
-                    delimiters: 'customBundleDelimiter',
-                    data: {
-                        // npmPluginsEnabled object is filled from loadOptions.js
-                        npmPluginsEnabled: JSON.stringify(gruntOpts.assets.npmPluginsEnabled, null, 4)
-                    }
+                    delimiters: 'customBundleDelimiter'
                 })
             );
             grunt.log.ok('Writing to '+outputFullPath);
@@ -328,7 +322,7 @@ module.exports = function(grunt) {
 
     // Test task. Execute with running app
     grunt.registerTask('test', 'Run ALL tests or specified by second param', function () {
-        // if custom mask set - `grunt test --spec=test/unit/middleware/**/*.js`
+        // if custom mask set - `grunt test --spec=test/unit/**/*.js`
         var spec = grunt.option('spec');
         if (spec) {
             grunt.config.set('mochaTest.test.src', [spec]);
@@ -340,7 +334,7 @@ module.exports = function(grunt) {
 
     // Test task. Execute with running app
     grunt.registerTask('test-func', 'Run ALL functional tests or specified by second param', function () {
-        // if custom mask set - `grunt test --spec=test/unit/middleware/**/*.js`
+        // if custom mask set - `grunt test --spec=test/functional/**/*.js`
         var spec = grunt.option('spec');
         if (spec) {
             grunt.config.set('casperjs.files', [spec]);

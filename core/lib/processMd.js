@@ -3,11 +3,13 @@
 var path = require('path');
 var marked = require('marked');
 var cheerio = require('cheerio');
-var deepExtend = require('deep-extend');
+var _ = require('lodash');
 var translit = require(path.join(global.pathToApp,'core/lib/translit'));
 var utils = require(path.join(global.pathToApp,'core/lib/utils'));
 
 var renderer = new marked.Renderer();
+
+var markedCodeRenderCounter = 0;
 
 // Module configuration
 var globalConfig = global.opts.core && global.opts.core.processMd ? global.opts.core.processMd : {};
@@ -27,17 +29,22 @@ utils.extendOptions(config, globalConfig);
 
 // Processing with native markdown renderer
 renderer.code = function (code, language) {
+    var result = '';
+
     if (config.languageRenderers.hasOwnProperty(language)) {
-        return config.languageRenderers[language](code);
+        result = config.languageRenderers[language](code, markedCodeRenderCounter);
     } else {
         if (config.espaceCodeHTML) code = code.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
         if (language && language !== '') {
-            return '<code class="src-' + language + ' source_visible">' + code + '</code>';
+            result = '<code class="src-' + language + ' source_visible">' + code + '</code>';
         } else {
-            return '<pre><code class="lang-source_wide-code">' + code + '</code></pre>';
+            result = '<pre><code class="lang-source_wide-code">' + code + '</code></pre>';
         }
     }
+
+    markedCodeRenderCounter++;
+    return result;
 };
 
 renderer.heading = function (text, level) {
@@ -47,11 +54,13 @@ renderer.heading = function (text, level) {
 };
 
 // Extend re-defined renderer
-config.marked.renderer = deepExtend(renderer, config.marked.renderer);
+config.marked.renderer = _.merge(renderer, config.marked.renderer);
 
 marked.setOptions(config.marked);
 
 module.exports = function (markdown, options) {
+    markedCodeRenderCounter = 0;
+
     var _options = options || {};
     var $ = cheerio.load('<div id="content">' + marked(markdown) + '</div>');
     var $content = $('#content').first();

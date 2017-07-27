@@ -8,7 +8,7 @@ module.exports = {
         common: {
             defaultLogLevel: 'INFO',
             defaultProdLogLevel: 'ERROR',
-            includedDirs: ['docs'],
+            includedDirs: ['docs', 'test'],
             specPaths: ['specs'],
 
             // Turn on context level setting
@@ -17,7 +17,8 @@ module.exports = {
             // Name of context level settings file
             contextOptionsFile: 'sourcejs-options.js',
 
-            // Path to your SourceJS configuration folder
+            // Custom path to user contents path, relative to SourceJS root
+            // Used only in case if SourceJS installed as a parent folder for content (old approach)
             pathToUser: 'user',
 
             // Name of spec meta info file
@@ -42,11 +43,13 @@ module.exports = {
 
         // Spec catalogs navigation tree
         fileTree: {
-            // Exclude files from file-tree indexing (first level, in user folder)
-            excludedDirs: ['node_modules', 'bower_components', 'data', 'plugins', '.git', '.idea'],
-
-            // Exclude files from file-tree indexing (on any level, by folder name)
-            excludedDirsGlobal: ['node_modules', '.git', '.idea'],
+            // Glob excludes for `info.json` search paths
+            excludes: [
+                '!**/node_modules/**',
+                '!**/bower_components/**',
+                '!**/.git/**',
+                '!**/.idea/**'
+            ],
 
             // Update navigation tree by cron task (setTimeout)
             cron: false,
@@ -171,10 +174,6 @@ module.exports = {
 
     // External plugins options (are also exposed to client-side
     plugins: {
-        // PhantomJS HTML API parser will be moved to plugin at v.0.6
-        htmlParser: {
-            enabled: false
-        }
     },
 
     /*

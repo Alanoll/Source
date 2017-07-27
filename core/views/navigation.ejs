@@ -7,9 +7,9 @@
     <title><%= info.title %></title>
 
     <!-- Source default resources -->
-        <link href="/source/assets/css/source.css" rel="stylesheet" data-source="core">
-        <script src="/source/assets/js/require.bundle.js" data-source="core"></script>
-        <script src="/source/assets/js/enter-the-source.js" data-source="core"></script>
+    <link href="/source/assets/css/source.css" rel="stylesheet" data-source="core">
+    <script src="/source/assets/js/require.bundle.js" data-source="core"></script>
+    <script src="/source/assets/js/enter-the-source.js" data-source="core"></script>
     <!-- /Source default resources -->
 
     <%- head %>
@@ -17,6 +17,7 @@
 <body class="source_page __navigation">
     <div class="source_container">
         <%- header %>
+        <%- breadcrumb %>
         <div class="source_main source_col-main" role="main">
             <%- content %>
         </div>

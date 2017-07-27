@@ -2,7 +2,7 @@
 
 var path = require('path');
 var fs = require('fs-extra');
-var parseData = require(path.join(global.pathToApp, 'core/lib/parseData'));
+var ParseData = require(path.join(global.pathToApp, 'core/lib/parseData'));
 
 
 /**
@@ -39,9 +39,11 @@ var parseSpecUrlPath = module.exports.parseSpecUrlPath = function(urlPath){
  * @returns {String} Return a parsed Spec ID
  */
 var getSpecIDFromUrl = module.exports.getSpecIDFromUrl = function(urlToSpec){
-    urlToSpec = urlToSpec.replace(/^\//, '').replace(/\/+$/, '');
-
-    return urlToSpec;
+    if (urlToSpec === '/') {
+        return urlToSpec;
+    } else {
+        return urlToSpec.replace(/^\//, '').replace(/\/+$/, '');
+    }
 };
 
 /**
@@ -53,10 +55,11 @@ var getSpecIDFromUrl = module.exports.getSpecIDFromUrl = function(urlToSpec){
  */
 module.exports.getSpecInfo = function(urlSpecPath) {
     var specsDataPath = path.join(global.pathToApp, global.opts.core.api.specsData);
-    var parseSpecData = new parseData({
+    var parseSpecData = new ParseData({
         scope: 'specs',
         path: specsDataPath
     });
+
     var specID = getSpecIDFromUrl(urlSpecPath);
 
     return parseSpecData.getByID(specID);
@@ -109,15 +112,15 @@ module.exports.getSpecFromDir = function(dirPath, specFiles) {
 module.exports.getFullPathToSpec = function(urlPath){
     var pathToSpec = parseSpecUrlPath(urlPath).pathToSpec;
     var cleanPath = urlPath.replace(/\/+$/, '').replace(/\//, '');
-    var specPath = path.join(global.app.get('user'), pathToSpec).replace(/\\/g, '/');
+    var specPath = path.join(global.userPath, pathToSpec);
 
     // Including non-standard paths, outside default static route
     global.opts.core.common.includedDirs.forEach(function(item){
         if (cleanPath.split('/')[0] === item) {
-            specPath = specPath.replace('/' + global.opts.core.common.pathToUser + '/' + cleanPath, '/' + cleanPath);
+            specPath = specPath.replace(global.userPath, global.pathToApp);
         }
     });
 
     // remove trailing slash
-    return specPath.replace(/\/+$/, '');
+    return path.normalize(specPath).replace(/\/+$/, '');
 };

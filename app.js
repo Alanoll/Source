@@ -1,7 +1,7 @@
 /*!
 * SourceJS - Living Style Guides Engine and Integrated Maintenance Environment for Front-end Components
 * @copyright 2013-2015 Sourcejs.com
-* @license MIT license: http://github.com/sourcejs/source/wiki/MIT-License
+* @license MIT license: http://github.com/sourcejs/sourcejs/wiki/MIT-License
 * */
 
 'use strict';
@@ -17,7 +17,7 @@ var favicon = require('serve-favicon');
 /* Globals */
 // Define absolute path to app, normalizing windows disk name
 global.pathToApp = __dirname.replace(/^\w:\\/, function (match) {
-    return match.toLowerCase();
+    return match.toUpperCase();
 });
 
 var app = global.app = express();
@@ -27,10 +27,10 @@ global.opts = loadOptions();
 
 // Arguments parse */
 commander
+    .allowUnknownOption()
     .option('-l, --log [string]', 'Log level (default: ' + global.opts.core.common.defaultLogLevel + ').',  global.opts.core.common.defaultLogLevel)
-    .option('-p, --port [number]', 'Server port (default: ' + global.opts.core.server.port + ').')
+    .option('-p, --port [number]', 'Server port (default: ' + global.opts.core.server.port + '). Note: `process.env.PORT` will override this option if present.')
     .option('--hostname [string]', 'Server hostname  (default: ' + global.opts.core.server.hostname + ').')
-    .option('--html', 'Turn on HTML parser on app start (requires installed and enabled parser).')
     .option('--test', 'Run app with tests.')
     .option('--no-watch', 'Run with disabled watcher.')
     .option('--post-grunt [string]', 'Define Grunt command to run after app start', 'ci-post-run')
@@ -40,8 +40,14 @@ global.commander = commander;
 
 var trackStats = require(path.join(global.pathToApp, 'core/trackStats'));
 
-app.set('views', path.join(__dirname, 'core/views'));
-app.set('user', path.join(__dirname, global.opts.core.common.pathToUser));
+var getUserPath = require('./core/lib/getUserPath');
+var userPath = global.userPath = getUserPath();
+global.isNodeModule = getUserPath.isNodeModule;
+
+// Legacy support
+app.set('user', userPath);
+
+console.log('Running user contents from', '`' + userPath + '`.');
 
 // We support `development` (default), `production` and `presentation` (for demos)
 var MODE = global.MODE = process.env.NODE_ENV || 'development';
@@ -53,15 +59,6 @@ var logger = require('./core/logger');
 var log = logger.log;
 global.log = log;
 
-if (commander.html) {
-    trackStats.event({
-        group: 'features',
-        event: 'enabled html parser'
-    });
-
-    global.opts.plugins.htmlParser.enabled = true;
-    global.opts.plugins.htmlParser.onStart = true;
-}
 if (commander.port) global.opts.core.server.port = parseInt(commander.port);
 if (commander.hostname) global.opts.core.server.hostname = commander.hostname;
 if (!commander.watch) {
@@ -70,6 +67,11 @@ if (!commander.watch) {
         event: 'disabled watch'
     });
     global.opts.core.watch.enabled = false;
+}
+
+if (process.env.PORT) {
+    global.opts.core.server.port = process.env.PORT;
+    console.log('Using defined app PORT from environment variable: ' + process.env.PORT);
 }
 /* /Globals */
 
@@ -120,7 +122,7 @@ app.use(function (req, res, next) {
 });
 
 // Favicon
-var faviconPath = path.join(app.get('user'), 'favicon.ico');
+var faviconPath = path.join(userPath, 'favicon.ico');
 if (fs.existsSync(faviconPath)){
     app.use(favicon(faviconPath));
 }
@@ -167,6 +169,9 @@ app.use('/api/updateFileTree', function(req, res){
 });
 
 
+// Intercept static serve to localize requirejs
+app.use(require(path.join(global.pathToApp, 'core/privateAmdTransformer.js')));
+
 // Routes
 require('./core/routes');
 
@@ -177,10 +182,16 @@ require('./core/api/optionsApi');
 // User extenstions
 require("./core/loadPlugins.js");
 
-try {
-    // User additional functionality
-    require(app.get('user') + "/core/app.js");
-} catch(e){}
+// User extended app.js
+var pathToUserAppExtension = path.join(userPath, 'core/app.js');
+
+if (fs.existsSync(pathToUserAppExtension)) {
+    try {
+        require(pathToUserAppExtension);
+    } catch(e){
+        log.warn('Error loading user app.js from ' + pathToUserAppExtension, e);
+    }
+}
 
 
 // Watchers
@@ -201,22 +212,22 @@ if (global.opts.core.watch.enabled && global.MODE === 'development') {
 var headerFooter = require('./core/headerFooter');
 
 // Static content
-app.use(express.static(app.get('user')));
+app.use(express.static(userPath));
 
 // Page 404
 app.use(function(req, res){
-	if (req.accepts('html')) {
+    if (req.accepts('html')) {
         if (req.url === '/') {
             res.redirect('/docs');
             return;
         }
 
         var headerFooterHTML = headerFooter.getHeaderAndFooter();
-		res.status(404).render(path.join(__dirname, '/core/views/404.ejs'), {
+        res.status(404).render(path.join(__dirname, '/core/views/404.ejs'), {
             header: headerFooterHTML.header,
             footer: headerFooterHTML.footer
-		});
-	}
+        });
+    }
 });
 /* /Serving content */
 
@@ -228,7 +239,7 @@ var logErrors = function(err, req, res, next) {
         var url = req.url || '';
 
         log.debug(req.method, req.headers);
-        log.error(('Requested url: ' + url).red, ('Error: ' + err.stack).red);
+        log.error(('Error on requesting url: ' + url).red +'.', ('Error: ' + err.stack).red);
 
         if (req.xhr) {
             res.status(500).json({msg: 'Server error'});
@@ -243,10 +254,7 @@ var logErrors = function(err, req, res, next) {
 app.use(logErrors);
 /* /Error handling */
 
-
-
-/* Server start */
-if (!module.parent) {
+var startServer = function () {
     var serverOpts = global.opts.core.server;
     var port = serverOpts.port;
 
@@ -256,7 +264,7 @@ if (!module.parent) {
     if (commander.test) {
         var spawn = require('cross-spawn');
 
-        spawn('./node_modules/grunt-cli/bin/grunt', [commander.postGrunt, '--port='+port], {stdio: 'inherit'})
+        spawn('./node_modules/grunt-cli/bin/grunt', [commander.postGrunt, '--port=' + port], { stdio: 'inherit' })
             .on('close', function (code) {
                 if (code === 0) {
                     log.info('Test successful');
@@ -279,5 +287,14 @@ if (!module.parent) {
             }, true);
         }
     }
+};
+
+/* Server start */
+if (!module.parent) {
+    startServer();
 }
 /* Server start */
+
+module.exports = {
+    startServer: startServer
+};

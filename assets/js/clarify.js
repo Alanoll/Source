@@ -1,24 +1,21 @@
 /*!
 * SourceJS - Front-end documentation engine
 * @copyright 2013-2015 Sourcejs.com
-* @license MIT license: http://github.com/sourcejs/source/wiki/MIT-License
+* @license MIT license: http://github.com/sourcejs/sourcejs/wiki/MIT-License
 * */
 
-require([
+sourcejs.amd.require([
     "jquery",
     'text!/api/options',
     "sourceModules/utils",
     "sourceLib/lodash",
     "text!sourceTemplates/clarifyPanel.inc.html"
-    ], function ($, options, u, _, clarifyPanelTpl){
+], function ($, options, u, _, clarifyPanelTpl){
+    var triesLimit = 2;
+    var triesCount = 0;
 
-    // If we have data from Clarify output
-    if (window.sourceClarifyData){
-        var _options = JSON.parse(options);
-        var htmlParser = _options.plugins && _options.plugins.htmlParser && _options.plugins.htmlParser.enabled;
-
+    var handler = function() {
         var $panelTemplate = $(_.template(clarifyPanelTpl, {
-            htmlParser: htmlParser,
             showApiTargetOption: window.sourceClarifyData.showApiTargetOption,
             specUrl: window.sourceClarifyData.specUrl,
             tplList: window.sourceClarifyData.tplList,
@@ -85,7 +82,21 @@ require([
 
             location.href = clarifyBaseUrl + constructedParams;
         });
-    } else {
-        console.log('Clarify panel failed to receive expected data from clarify, check your tpl.');
-    }
+    };
+
+    var renderClarify = function(){
+        // If we have data from Clarify output
+        if (window.sourceClarifyData){
+            handler();
+        } else {
+            if (triesCount < triesLimit) {
+                triesCount++;
+                setTimeout(renderClarify, 1000);
+            } else {
+                console.log('Clarify panel failed to receive expected data from clarify, check your tpl.');
+            }
+        }
+    };
+
+    renderClarify();
 });

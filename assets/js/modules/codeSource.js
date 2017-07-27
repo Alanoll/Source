@@ -4,7 +4,7 @@
  *
  * */
 
-define([
+sourcejs.amd.define([
     "jquery",
     "source/load-options",
     "sourceModules/utils",
@@ -13,7 +13,7 @@ define([
     "sourceLib/codeFormat",
     "sourceModules/innerNavigation",
     "sourceLib/prism/prism"
-], function($, options, utils, Css, browser, codeFormat, innerNavigation) {
+], function($, options, utils, Css, browser, codeFormat, innerNavigation, Prism) {
     'use strict';
 
     if (!(browser.msie && parseInt(browser.version, 10) < 9)) { // and if not ie < 9
@@ -170,7 +170,9 @@ define([
             };
 
             var afterActivation = function() {
-                var sources = $('.' + SourceCode);
+                var sources = $('.' + SourceCode).filter(function() {
+                    return !$(this).next().hasClass('source_ignore');
+                });
                 sources.addClass(SourceCodeShow);
 
                 //Scroll to section
@@ -192,7 +194,9 @@ define([
                 if (!prepared) {
                     fillCodeContainers();
                     prepareCodeBlocks();
-                    $('pre').removeAttr('style');
+                    $('pre').filter(function() {
+                        return !$(this).closest('.source_source-code').next().hasClass('source_ignore');
+                    }).removeAttr('style');
                     prepared = true;
                 }
                 afterActivation();

@@ -4,7 +4,7 @@
 
 var path = require('path');
 var watch = require('gulp-watch');
-var deepExtend = require('deep-extend');
+var _ = require('lodash');
 var commander = require('commander');
 
 // Parse arguments
@@ -25,6 +25,8 @@ var logger = require(path.join(global.pathToApp, 'core/logger'));
 var log = logger.log;
 global.log = log;
 
+var userPath = global.userPath = (require(path.join(global.pathToApp, 'core/lib/getUserPath')))();
+
 var utils = require(path.join(global.pathToApp, 'core/lib/utils'));
 var fileTree = require(path.join(global.pathToApp, 'core/file-tree'));
 
@@ -33,11 +35,13 @@ var config = {
     verbose: false,
     glob: [
         '!' + global.pathToApp + '/**/.*/**',
-        '!' + global.pathToApp + '/**/bower_components/**',
-        '!' + global.pathToApp + '/**/node_modules/**',
+        '!' + userPath + '/**/.*/**',
+        '!' + userPath + '/**/bower_components/**',
+        '!' + userPath + '/**/node_modules/**',
 
-        global.pathToApp + '/**/' + global.opts.core.common.infoFile,
-        global.pathToApp + '/' + global.opts.core.common.pathToUser + '/**/' + global.opts.core.common.infoFile
+        global.pathToApp + '/docs/**/' + global.opts.core.common.infoFile,
+        global.pathToApp + '/test/**/' + global.opts.core.common.infoFile,
+        userPath + '/**/' + global.opts.core.common.infoFile
     ],
     ignoreHiddenFiles: true
 };
@@ -47,7 +51,7 @@ utils.extendOptions(config, global.opts.core.watch);
 var prepareData = function(data, targetFile){
     var dir = path.dirname(targetFile);
 
-    return deepExtend(fileTree.getSpecMeta(dir), data);
+    return _.merge(fileTree.getSpecMeta(dir), data);
 };
 
 if (config.enabled){
@@ -60,7 +64,7 @@ if (config.enabled){
     }, function(vinyl){
         var filePath = vinyl.path.replace(/\\/g, '/');
         var event = vinyl.event;
-        var cleanPath = filePath.replace(global.pathToApp + '/', '').replace(global.opts.core.common.pathToUser +'/', '');
+        var cleanPath = filePath.replace(userPath, '').replace(global.pathToApp + '/', '');
         var specID = path.dirname(cleanPath);
         var rawContents;
 

@@ -1,10 +1,10 @@
 /*!
 * SourceJS - Front-end documentation engine
 * @copyright 2013-2015 Sourcejs.com
-* @license MIT license: http://github.com/sourcejs/source/wiki/MIT-License
+* @license MIT license: http://github.com/sourcejs/sourcejs/wiki/MIT-License
 * */
 
-require([
+sourcejs.amd.require([
     "jquery",
     "source/load-options", // TODO: remove when all modules inherit Module()
     "sourceModules/browser",

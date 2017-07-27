@@ -1,16 +1,16 @@
 /*!
  * SourceJS - Living Style Guides Engine and Integrated Maintenance Environment for Front-end Components
  * @copyright 2013-2015 Sourcejs.com
- * @license MIT license: http://github.com/sourcejs/source/wiki/MIT-License
+ * @license MIT license: http://github.com/sourcejs/sourcejs/wiki/MIT-License
  * */
 
 requirejs.config({
     urlArgs: 'cb=' + Math.random(), /* to avoid caching */
 
     paths: {
-        test: '/test',
-        jasmine: '/test/jasmine/jasmine',
-        'jasmine-html': '/test/jasmine/jasmine-html'
+        test: '/jasmine-test',
+        jasmine: '/jasmine-test/jasmine/jasmine',
+        'jasmine-html': '/jasmine-test/jasmine/jasmine-html'
     },
 
     shim: {
@@ -39,9 +39,9 @@ require(['jquery', 'jasmine-html'], function($, jasmine){
 
     var specs = [];
 
-    specs.push('test/spec/moduleSpec');
-    specs.push('test/spec/sectionsSpec');
-    specs.push('test/spec/innerNavigationSpec');
+    specs.push('spec/moduleSpec');
+    specs.push('spec/sectionsSpec');
+    specs.push('spec/innerNavigationSpec');
 
     $(function(){
         require(specs, function(){

@@ -15,12 +15,13 @@ var specUtils = require(path.join(global.pathToApp,'core/lib/specUtils'));
  * @param {object} req - Request object
  * @param {object} res - Response object
  * @param {function} next - The callback function
- * */
+ *
+ */
 exports.process = function (req, res, next) {
 
     // Check if we're working with processed file
     if (req.specData && req.specData.renderedHtml) {
-        var specDir = specUtils.getFullPathToSpec(req.url);
+        var specDir = specUtils.getFullPathToSpec(req.path);
         var contextOptions = req.specData.contextOptions;
 
         // get spec content
@@ -38,6 +39,17 @@ exports.process = function (req, res, next) {
             context = specDir;
         } else if (info.role === 'navigation') {
             viewParam = 'navigation';
+        }
+
+        // Check if we're working with included dirs
+        if (context) {
+            global.opts.core.common.includedDirs.forEach(function (includedDir) {
+                var pathToCheck = (path.join(global.userPath, includedDir) + '/').replace(/\\/g, '/');
+
+                if (context.indexOf(pathToCheck) === 0) {
+                    context = context.replace(pathToCheck, path.join(global.pathToApp, includedDir) + '/');
+                }
+            });
         }
 
         var templatePath = viewResolver(viewParam, contextOptions.rendering.views, context) || viewParam;
@@ -79,6 +91,7 @@ exports.process = function (req, res, next) {
                 engineVersion: global.engineVersion,
                 content: content,
                 head: head,
+                breadcrumb: req.specData.breadcrumb || '',
                 info: info
             };
 
@@ -106,7 +119,8 @@ exports.process = function (req, res, next) {
                     filename: templatePath
                 });
             } catch(err){
-                req.specData.renderedHtml = 'Error rendering Spec with EJS: ' + template;
+                global.log.error('wrap.js: could not render Spec with EJS: ' + templatePath + ' on: ' + req.path, err);
+                req.specData.renderedHtml = 'Error rendering Spec with EJS: <noscript>' + template + '</noscript>';
             }
 
 

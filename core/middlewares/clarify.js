@@ -5,23 +5,20 @@ var fs = require('fs-extra');
 var url = require('url');
 var Q = require('q');
 var _ = require('lodash');
-var jsdom = require('jsdom');
+var http = require('http');
 
 var ejs = require(path.join(global.pathToApp, 'core/ejsWithHelpers.js'));
 var trackStats = require(path.join(global.pathToApp, 'core/trackStats'));
-var pathToApp = path.dirname(require.main.filename);
+var pathToApp = global.pathToApp;
 var specUtils = require(path.join(pathToApp, 'core/lib/specUtils'));
-var parseData = require(path.join(pathToApp, 'core/lib/parseData'));
-var htmlParser = require(path.join(pathToApp, 'core/html-tree/html-parser'));
-
+var ParseData = require(path.join(pathToApp, 'core/lib/parseData'));
+var specsParser = require(path.join(pathToApp, 'core/lib/specPageParser'));
 
 var htmlDataPath = path.join(pathToApp, global.opts.core.api.htmlData);
-var parseHTMLData = new parseData({
+var parseHTMLData = new ParseData({
     scope: 'html',
     path: htmlDataPath
 });
-
-var htmlParserEnabled = global.opts.plugins && global.opts.plugins.htmlParser && global.opts.plugins.htmlParser.enabled;
 
 //TODO JSdoc
 
@@ -32,9 +29,9 @@ var getTpl = function(tpl) {
 
     // TODO: use view resolver
     var pathToTemplate = path.join(pathToApp, 'core/views/clarify', templateName + '.ejs');
-    var userPathToTemplate = path.join(global.app.get('user'), 'core/views/clarify', templateName + '.ejs');
+    var userPathToTemplate = path.join(global.userPath, 'core/views/clarify', templateName + '.ejs');
 
-    // First we check user tempalte, then core
+    // First we check user tempalate, then core
     fs.readFile(userPathToTemplate, 'utf-8', function(err, data){
         if (err) {
 
@@ -59,7 +56,7 @@ var getTplList = function(){
     var deferred = Q.defer();
 
     var pathToTemplates = path.join(pathToApp, 'core/views/clarify');
-    var userPathToTemplates = path.join(global.app.get('user'), 'core/views/clarify');
+    var userPathToTemplates = path.join(global.userPath, 'core/views/clarify');
 
     var templatesList = [];
 
@@ -99,32 +96,32 @@ var getTplList = function(){
     return deferred.promise;
 };
 
-// TODO: Move to standalone API, for fast JSDOM spec parsing
 var parseSpec = function(sections, pathToSpec) {
     var deferred = Q.defer();
 
-    // Parsing spec with JSdom
-    jsdom.env(
-        'http://127.0.0.1:' + global.opts.core.server.port + pathToSpec + '?internal=true',
-        ['http://127.0.0.1:' + global.opts.core.server.port + '/source/assets/js/modules/sectionsParser.js'],
-        function (err, window) {
-            if (err) {
-                deferred.reject({
-                    err: err,
-                    msg: 'JSDOM error'
-                });
-                return;
-            }
+    var options = {
+        host: '127.0.0.1',
+        port: global.opts.core.server.port,
+        path: pathToSpec + '?internal=true'
+    };
 
+    var fullUrl = options.host + ':' + options.port + options.path;
+
+    var callback = function (response) {
+        var specHTML = '';
+
+        //another chunk of data has been recieved, so append it to `str`
+        response.on('data', function (chunk) {
+            specHTML += chunk;
+        });
+
+        //the whole response has been recieved, so we just print it out here
+        response.on('end', function () {
             var output = {};
-
-            var SourceGetSections = window.SourceGetSections;
-
-            var parser = new SourceGetSections();
-            var allContents = parser.getSpecFull();
+            var allContents = specsParser.process(specHTML);
 
             if (sections) {
-                output = parser.getSpecFull(sections);
+                output = specsParser.getBySection(_.merge({}, allContents), sections);
             } else {
                 output = allContents;
             }
@@ -139,23 +136,18 @@ var parseSpec = function(sections, pathToSpec) {
                     msg: 'Requested sections HTML not found'
                 });
             }
-        }
-    );
+        });
+    };
 
-    return deferred.promise;
-};
+    var request = http.request(options, callback);
 
-var updateApiData = function(specID) {
-    var deferred = Q.defer();
-    var specs = [specID];
-
-    htmlParser.processSpecs(specs, function(err){
-        if (err) {
-            deferred.reject(err);
-        } else {
-            deferred.resolve();
-        }
+    request.on('error', function (e) {
+        deferred.reject({
+            msg: 'Failed loading spec ' + fullUrl
+        });
     });
+
+    request.end();
 
     return deferred.promise;
 };
@@ -188,20 +180,7 @@ var getDataFromApi = function(sections, specID, apiUpdate) {
         }
     };
 
-    if (apiUpdate) {
-        updateApiData(specID).then(function(){
-            getSpecData();
-        }).fail(function(err) {
-            var msg = 'Failed updating HTML Spec API. ';
-
-            deferred.reject({
-                err: err,
-                msg: msg
-            });
-        });
-    } else {
-        getSpecData();
-    }
+    getSpecData();
 
     return deferred.promise;
 };
@@ -231,14 +210,14 @@ var getSectionsIDList = function(sections) {
 };
 
 module.exports.process = function(req, res, next) {
-	var parsedUrl = url.parse(req.url, true);
+    var parsedUrl = url.parse(req.url, true);
 
     // Query params
     var q = parsedUrl.query || {};
     var clarifyFlag = q.clarify;
 
     // Check if middleware needs to be activated
-	if (clarifyFlag) {
+    if (clarifyFlag) {
         var urlPath = parsedUrl.pathname;
         var parsedPath = specUtils.parseSpecUrlPath(urlPath);
 
@@ -264,8 +243,6 @@ module.exports.process = function(req, res, next) {
             return;
         }
 
-        if (!specHasHTMLAPIData) apiUpdate = true;
-
         var getSpecData = function(){
             return fromApi ? getDataFromApi(sections, specID, apiUpdate) : parseSpec(sections, parsedPath.pathToSpec);
         };
@@ -287,7 +264,7 @@ module.exports.process = function(req, res, next) {
                 };
 
                 var clarifyData = '<script>var sourceClarifyData = '+ JSON.stringify({
-                    showApiTargetOption: specHasHTMLAPIData || htmlParserEnabled,
+                    showApiTargetOption: specHasHTMLAPIData,
                     specUrl: specInfo.url,
                     sectionsIDList: getSectionsIDList(_specData.allContents),
                     tplList: tplList
@@ -337,7 +314,7 @@ module.exports.process = function(req, res, next) {
 
             res.status(500).send(errData.msg);
         });
-	} else {
+    } else {
         // redirect to next express middleware
         next();
     }

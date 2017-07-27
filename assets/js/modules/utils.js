@@ -4,7 +4,7 @@
 *
 * */
 
-define([
+sourcejs.amd.define([
     'jquery',
     'sourceModules/module'
     ], function ($, module) {
@@ -59,8 +59,8 @@ define([
         var specName;
         var pageUrl = window.location.pathname;
 
-        var pageUrlSplit = pageUrl.split("/"); //Разбивает на массив
-        specName = pageUrlSplit[pageUrlSplit.length - 2]; //Берет последнюю часть урла
+        var pageUrlSplit = pageUrl.split("/");
+        specName = pageUrlSplit[pageUrlSplit.length - 2];
 
         return specName;
     };
@@ -69,7 +69,7 @@ define([
         var pathToSpec = (function(){
             var path;
 
-            //specUrl is used from parseFileTree, and contains only path, without file like "/docs/spec"
+            //specUrl is used from parseFileTree, and contains only path, without file like "/docs/spec-html"
             if (typeof specUrlFromFileTree === 'undefined') {
                 path = window.location.pathname;
 
@@ -96,17 +96,17 @@ define([
     };
 
     Utils.prototype.getCookie = function(name) {
-		var matches = document.cookie.match(new RegExp("(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"));
-		return matches ? decodeURIComponent(matches[1]) : undefined;
+        var matches = document.cookie.match(new RegExp("(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"));
+        return matches ? decodeURIComponent(matches[1]) : undefined;
     };
 
     Utils.prototype.isDevelopmentMode = function() {
-		return this.getCookie('source-mode') === 'development';
+        return this.getCookie('source-mode') === 'development';
     };
 
-	Utils.prototype.isArray = function(arr) {
-		return Object.prototype.toString.call(arr) === '[object Array]';
-	};
+    Utils.prototype.isArray = function(arr) {
+        return Object.prototype.toString.call(arr) === '[object Array]';
+    };
 
     Utils.prototype.unifySpecPath = function(url) {
         if (url.slice(-10) === "index.html") url = url.slice(0, -10);

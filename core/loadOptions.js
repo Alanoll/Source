@@ -76,12 +76,12 @@ var legacyOptionsChecker = function(options, fileName){
 module.exports = function(basePath, _silent){
     silent = _silent;
 
-    var pathToApp = basePath || path.dirname(require.main.filename);
+    var pathToApp = basePath || global.pathToApp;
 
     var mergedOptions = utils.requireUncached(path.join(pathToApp, 'options'));
-    var pathToUser = path.join(pathToApp, mergedOptions.core.common.pathToUser);
 
     // Using specific path to specs parsing, because we don't have global.opts yet
+    var pathToUser = (require('./lib/getUserPath'))(mergedOptions, pathToApp);
     var userSettingsFile = path.join(pathToUser, 'options.js');
     var userLocalSettingsFile = path.join(pathToUser, 'local-options.js');
 

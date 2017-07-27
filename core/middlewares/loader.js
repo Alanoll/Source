@@ -8,7 +8,7 @@ var appRoot = global.pathToApp;
 var utils = require(path.join(appRoot, 'core/lib/utils'));
 var log = require(path.join(appRoot, 'core/logger')).log;
 
-var gatherMiddlewares = function(dest, filterRegExp, mainJS){
+var gatherMiddlewares = function (dest, filterRegExp, mainJS) {
     var output = {};
 
     if (fs.existsSync(dest)) {
@@ -41,7 +41,7 @@ var gatherMiddlewares = function(dest, filterRegExp, mainJS){
                                     if (overVal >= 0) {
                                         output[middlewareName][key] = overVal;
                                     } else {
-                                        log.warn('Middlewares are restricted to define order with value lower than 0 (zero). Please modify '+ middlewareName+ ' middleware options.');
+                                        log.warn('Middlewares are restricted to define order with value lower than 0 (zero). Please modify ' + middlewareName + ' middleware options.');
                                     }
                                 } else {
                                     output[middlewareName][key] = overVal;
@@ -57,7 +57,7 @@ var gatherMiddlewares = function(dest, filterRegExp, mainJS){
     return output;
 };
 
-var sortMiddlewares = function(groupsOrder, list){
+var sortMiddlewares = function (groupsOrder, list) {
     var output = [];
 
     if (!(groupsOrder && _.isArray(groupsOrder) && list)) return output;
@@ -79,21 +79,21 @@ var sortMiddlewares = function(groupsOrder, list){
 
     // Sort each group
     _.forOwn(groupedList, function (value, key) {
-        groupedList[key] = _.sortByOrder(value, ['order'], ['asc']);
+        groupedList[key] = _.orderBy(value, ['order'], ['asc']);
     });
 
     // Concat groups by order
-    groupsOrder.forEach(function(item){
+    groupsOrder.forEach(function (item) {
         if (groupedList[item]) output = output.concat(groupedList[item]);
     });
 
     return output;
 };
 
-var loadMiddlewares = function(listArr, app){
+var loadMiddlewares = function (listArr, app) {
     if (!_.isArray(listArr) && !app) return;
 
-    listArr.forEach(function(item){
+    listArr.forEach(function (item) {
         if (item && item.indexPath && fs.existsSync(item.indexPath)) {
             log.debug('require middleware', item.indexPath);
             app.use(require(item.indexPath).process);
@@ -101,7 +101,7 @@ var loadMiddlewares = function(listArr, app){
     });
 };
 
-module.exports.process = function(app, globalOptions){
+module.exports.process = function (app, globalOptions) {
     var config = {
         loadGroupsOrder: [
             'request',
@@ -116,6 +116,18 @@ module.exports.process = function(app, globalOptions){
                 order: -1,
                 group: 'pre-html',
                 indexPath: path.join(appRoot, 'core/middlewares/md.js')
+            },
+            preRenderEjs: {
+                enabled: true,
+                order: -2,
+                group: 'pre-html',
+                indexPath: path.join(appRoot, 'core/middlewares/preRenderEjs.js')
+            },
+            breadcrumb: {
+                enabled: true,
+                order: -2,
+                group: 'pre-html',
+                indexPath: path.join(appRoot, 'core/middlewares/breadcrumb.js')
             },
             mdTag: {
                 enabled: true,
@@ -152,7 +164,7 @@ module.exports.process = function(app, globalOptions){
     utils.extendOptions(
         config,
         {
-            list: gatherMiddlewares(path.join(app.get('user'), 'node_modules'), new RegExp(/^sourcejs-/), 'core/middleware/index.js')
+            list: gatherMiddlewares(path.join(global.userPath, 'node_modules'), new RegExp(/^sourcejs-/), 'core/middleware/index.js')
         },
         globalOptions.core.middlewares
     );
