@@ -1,4 +1,4 @@
-// Default SourceJS engine configuration
+﻿// Default SourceJS engine configuration
 
 module.exports = {
 
@@ -153,6 +153,10 @@ module.exports = {
                 autofocusOnNavigationPage: true,
                 autofocusOnSpecPage: false,
                 activateOnLoad: true
+            },
+
+            codeSource: {
+                visible: false
             }
         },
 
