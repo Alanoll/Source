@@ -228,7 +228,7 @@ sourcejs.amd.define([
             if ($('[class*="src-"]:not(.source_visible)')[0]) {
               innerNavigation.addMenuItem(RES_TOGGLER_SHOW_CODE, showAllCode, hideAllCode, 'source_source-code_action-item');
 
-              if (options.moduleOptions && options.moduleOptions.codeSource && options.moduleOptions.codeSource.visible) {
+              if (options.modulesOptions && options.modulesOptions.codeSource && options.modulesOptions.codeSource.visible) {
                 $('.source_source-code_action-item .source_slider_frame').click();
               }
             }
