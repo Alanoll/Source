@@ -225,15 +225,20 @@ sourcejs.amd.define([
                 utils.scrollToSection(navHash);
             };
 
+            var hiddenCodeExists = false;
             if ($('[class*="src-"]:not(.source_visible)')[0]) {
+                hiddenCodeExists = true;
+            }
+
+            showStaticCode();
+
+            if (hiddenCodeExists) {
               innerNavigation.addMenuItem(RES_TOGGLER_SHOW_CODE, showAllCode, hideAllCode, 'source_source-code_action-item');
 
               if (options.modulesOptions && options.modulesOptions.codeSource && options.modulesOptions.codeSource.visible) {
                 $('.source_source-code_action-item .source_slider_frame').click();
               }
             }
-
-            showStaticCode();
         });
     }
 });
